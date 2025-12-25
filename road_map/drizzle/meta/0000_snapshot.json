@@ -1,5 +1,5 @@
 {
-  "id": "6cc0d5fe-6f2a-47ab-b8af-7e46eb5fb8cd",
+  "id": "7771c5d4-1ef7-4632-b7bc-1ee6feba6989",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -20,27 +20,39 @@
           "primaryKey": false,
           "notNull": true
         },
-        "chapter_name": {
-          "name": "chapter_name",
+        "chapter": {
+          "name": "chapter",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
         },
-        "concept_covered": {
-          "name": "concept_covered",
+        "concept": {
+          "name": "concept",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
         },
-        "video_link": {
-          "name": "video_link",
+        "order_index": {
+          "name": "order_index",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "video_title": {
+          "name": "video_title",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "video_url": {
+          "name": "video_url",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "quiz_identifier": {
-          "name": "quiz_identifier",
-          "type": "varchar(100)",
+        "quiz_id": {
+          "name": "quiz_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         }
@@ -57,21 +69,27 @@
       "name": "quiz",
       "schema": "",
       "columns": {
-        "quiz_id": {
-          "name": "quiz_id",
+        "id": {
+          "name": "id",
           "type": "serial",
           "primaryKey": true,
           "notNull": true
         },
-        "quiz_identifier": {
-          "name": "quiz_identifier",
-          "type": "varchar(100)",
+        "quiz_id": {
+          "name": "quiz_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "question_number": {
+          "name": "question_number",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
         "question_type": {
           "name": "question_type",
-          "type": "varchar(50)",
+          "type": "varchar(10)",
           "primaryKey": false,
           "notNull": true
         },
@@ -87,17 +105,65 @@
           "primaryKey": false,
           "notNull": false
         },
-        "options": {
-          "name": "options",
-          "type": "jsonb",
+        "optionA_text": {
+          "name": "optionA_text",
+          "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
-        "correct_answer": {
-          "name": "correct_answer",
-          "type": "jsonb",
+        "optionA_image": {
+          "name": "optionA_image",
+          "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
+        },
+        "optionB_text": {
+          "name": "optionB_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "optionB_image": {
+          "name": "optionB_image",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "optionC_text": {
+          "name": "optionC_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "optionC_image": {
+          "name": "optionC_image",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "optionD_text": {
+          "name": "optionD_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "optionD_image": {
+          "name": "optionD_image",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "answer_key": {
+          "name": "answer_key",
+          "type": "varchar(5)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "numeric_answer": {
+          "name": "numeric_answer",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
         },
         "solution_text": {
           "name": "solution_text",
