@@ -3,18 +3,16 @@
 import { useState } from "react";
 import { ContentRow } from "@/src/types/content";
 import EditConceptDialog from "./dialogs/EditConceptDialog";
+import YoutubePreview from "./YoutubePreview";
 
-function getYouTubeThumbnail(url?: string) {
+function getThumbnail(url?: string) {
   if (!url) return null;
-
   try {
     const u = new URL(url);
     const id =
       u.searchParams.get("v") ||
       u.pathname.split("/").pop();
-
     if (!id) return null;
-
     return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
   } catch {
     return null;
@@ -36,42 +34,40 @@ export default function ConceptItem({
 }: Props) {
   const [isRenaming, setIsRenaming] = useState(false);
   const [name, setName] = useState(row.concept);
-  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
+  const [showVideo, setShowVideo] = useState(false);
 
-  const thumbnail = getYouTubeThumbnail(row.video_url);
+  const thumbnail = getThumbnail(row.video_url);
 
   return (
     <>
       <div
         draggable
-        onDragStart={(e) => {
+        onDragStart={(e) =>
           e.dataTransfer.setData(
             "text/plain",
             draggableIndex.toString()
-          );
-        }}
+          )
+        }
         onDragOver={(e) => e.preventDefault()}
-        onDrop={(e) => {
-          const from = Number(
-            e.dataTransfer.getData("text/plain")
-          );
-          onMove(from, draggableIndex);
-        }}
+        onDrop={(e) =>
+          onMove(
+            Number(e.dataTransfer.getData("text/plain")),
+            draggableIndex
+          )
+        }
         style={{
           padding: "10px",
           border: "1px solid #ddd",
           marginBottom: "8px",
           display: "flex",
-          justifyContent: "space-between",
           alignItems: "center",
           gap: "12px",
-          cursor: "grab",
         }}
         onClick={() => {
-          if (!isRenaming) setShowEditDialog(true);
+          if (!isRenaming) setShowEdit(true);
         }}
       >
-        {/* LEFT: Concept name */}
         <div style={{ flex: 1 }}>
           {isRenaming ? (
             <input
@@ -85,7 +81,6 @@ export default function ConceptItem({
                     setIsRenaming(false);
                     return;
                   }
-
                   await fetch("/api/content/update", {
                     method: "PUT",
                     headers: { "Content-Type": "application/json" },
@@ -94,7 +89,6 @@ export default function ConceptItem({
                       concept: name,
                     }),
                   });
-
                   setIsRenaming(false);
                   refresh();
                 }
@@ -106,63 +100,42 @@ export default function ConceptItem({
                 e.stopPropagation();
                 setIsRenaming(true);
               }}
-              style={{ cursor: "text", fontWeight: 500 }}
             >
               {row.concept}
             </span>
           )}
         </div>
 
-        {/* RIGHT: Video info */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-          }}
-          onClick={(e) => e.stopPropagation()}
-        >
-
-          <div style={{ textAlign: "right" }}>
-            
-            <a
-              href={row.video_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ fontSize: "11px" }}
-            >
-              {thumbnail && (
-            <img
-              src={thumbnail}
-              alt="video thumbnail"
-              width={80}
-              style={{ borderRadius: "4px" }}
-            />
-          )}
-            </a>
-          </div>
-
-          <button
-            onClick={async () => {
-              const ok = confirm("Delete this concept?");
-              if (!ok) return;
-
-              await fetch(`/api/content/delete?id=${row.id}`, {
-                method: "DELETE",
-              });
-
-              refresh();
+        {thumbnail && (
+          <img
+            src={thumbnail}
+            width={90}
+            style={{ cursor: "pointer" }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowVideo(true);
             }}
-          >
-            Delete
-          </button>
-        </div>
+          />
+        )}
+
+        <button
+          onClick={async (e) => {
+            e.stopPropagation();
+            if (!confirm("Delete this concept?")) return;
+            await fetch(`/api/content/delete?id=${row.id}`, {
+              method: "DELETE",
+            });
+            refresh();
+          }}
+        >
+          Delete
+        </button>
       </div>
 
       <EditConceptDialog
-        open={showEditDialog}
+        open={showEdit}
         row={row}
-        onClose={() => setShowEditDialog(false)}
+        onClose={() => setShowEdit(false)}
         onSaved={async ({
           id,
           concept,
@@ -184,11 +157,17 @@ export default function ConceptItem({
               video_url,
             }),
           });
-
-          setShowEditDialog(false);
+          setShowEdit(false);
           refresh();
         }}
       />
+
+      {showVideo && row.video_url && (
+        <YoutubePreview
+          videoUrl={row.video_url}
+          onClose={() => setShowVideo(false)}
+        />
+      )}
     </>
   );
 }
