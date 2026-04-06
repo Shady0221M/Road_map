@@ -1,7 +1,8 @@
-//db/queries.ts
+//@src/db/queries.ts
 import {db} from "./client";
-import {chapter , concept, subjectEnum , quizQuestion } from "./schema";
-import {eq, and, asc,sql} from "drizzle-orm";
+import {chapter , concept, subjectEnum , quizQuestion, userProgress } from "./schema";
+import {eq, and, asc,sql, desc} from "drizzle-orm";
+import { QuizQuestionRow } from "../types/content";
 
 export type Subject=(typeof subjectEnum.enumValues)[number];
 export type QuizQuestionInsert = {
@@ -26,11 +27,27 @@ export type QuizQuestionInsert = {
   solutionImage?: string;
 }
 
-export async function insertChapter(subject:Subject, chapterName:string){
-    return await db.insert(chapter).values({
-        subject,
-        chapterName:chapterName,
-    });
+export async function insertChapter(
+  subject: Subject,
+  chapterName: string,
+  clusterTag?: string
+) {
+  const maxOrderRow = await db
+    .select({
+      maxOrder: sql<number>`MAX("order")`
+    })
+    .from(chapter)
+    .where(eq(chapter.subject, subject))
+    .execute();
+
+  const nextOrder = (maxOrderRow[0]?.maxOrder ?? 0) + 1;
+
+  return await db.insert(chapter).values({
+    subject,
+    chapterName,
+    clusterTag: clusterTag ?? chapterName,
+    order: nextOrder,
+  });
 }
 
 export async function insertConcept(chapterId:number, conceptName:string,orderIndex:number, videoTitle: string, videoUrl:string ){
@@ -39,8 +56,15 @@ export async function insertConcept(chapterId:number, conceptName:string,orderIn
     );
 }
 
-export async function getChaptersBySubject(subjectName:Subject){
-    return await db.select({chapterId:chapter.id,chapterName:chapter.chapterName}).from(chapter).where(eq(chapter.subject,subjectName));
+export async function getChaptersBySubject(subjectName: Subject) {
+  return await db
+    .select({
+      chapterId: chapter.id,
+      chapterName: chapter.chapterName,
+      clusterTag: chapter.clusterTag,
+    })
+    .from(chapter)
+    .where(eq(chapter.subject, subjectName));
 }
 
 export async function getConceptsByChapter(chapterId: number){
@@ -109,4 +133,98 @@ export async function replaceQuizQuestions(
       }))
     );
   }
+}
+
+export async function getUserProgress(userId: number) {
+  return await db
+    .select()
+    .from(userProgress)
+    .where(eq(userProgress.userId, userId));
+}
+
+export async function upsertUserProgress({
+  userId,
+  conceptId,
+  completed,
+  score,
+}: {
+  userId: number;
+  conceptId: number;
+  completed?: boolean;
+  score?: number;
+}) {
+  const existing = await db
+    .select()
+    .from(userProgress)
+    .where(
+      and(
+        eq(userProgress.userId, userId),
+        eq(userProgress.conceptId, conceptId)
+      )
+    );
+
+  if (existing.length > 0) {
+    return await db
+      .update(userProgress)
+      .set({
+        ...(completed !== undefined && { completed }),
+        ...(score !== undefined && { score }),
+        lastAccessedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(userProgress.userId, userId),
+          eq(userProgress.conceptId, conceptId)
+        )
+      );
+  } else {
+    return await db.insert(userProgress).values({
+      userId,
+      conceptId,
+      completed: completed ?? false,
+      score,
+      lastAccessedAt: new Date(),
+      updatedAt: new Date(),
+    });
+  }
+}
+
+export async function markConceptAccessedDB(
+  userId: number,
+  conceptId: number
+) {
+  return await upsertUserProgress({
+    userId,
+    conceptId,
+  });
+}
+
+export async function markConceptCompletedDB(
+  userId: number,
+  conceptId: number
+) {
+  return await upsertUserProgress({
+    userId,
+    conceptId,
+    completed: true,
+  });
+}
+
+export async function unmarkConceptCompletedDB(
+  userId: number,
+  conceptId: number
+) {
+  return await db
+    .update(userProgress)
+    .set({
+      completed: false,
+      updatedAt: new Date(),
+    })
+    .where(
+      and(
+        eq(userProgress.userId, userId),
+        eq(userProgress.conceptId, conceptId)
+      )
+    );
 }

@@ -4,13 +4,10 @@
 import { useState, useEffect } from "react";
 import { Question } from "./types";
 import { mapRowToQuestion } from "./mappers";
-
-import QuizTimer from "./QuizTimer";
 import QuestionView from "./QuestionView";
 import ProgressBar from "./ProgressBar";
 import QuestionList from "./QuestionList";
-import { markConceptCompleted } from "@/src/utils/progress";
-
+import { useProgressContext } from "@/src/context/ProgressContext";
 import Button from "@/app/components/ui/Button";
 
 interface Props {
@@ -30,6 +27,9 @@ export default function QuizAttemptPanel({
   const [answers, setAnswers] = useState<Record<number, number | null>>({});
   const [timeLeft, setTimeLeft] = useState(120);
   const [quizFinished, setQuizFinished] = useState(false);
+  const { attemptQuiz } = useProgressContext();
+
+  
 
   function calculateScore() {
     let score = 0;
@@ -52,12 +52,6 @@ export default function QuizAttemptPanel({
     loadQuiz();
   }, [conceptId]);
   
-  useEffect(() => {
-  if (quizFinished) {
-    const score = calculateScore();
-    markConceptCompleted(conceptId, score);
-  }
-}, [quizFinished]);
 
   useEffect(() => {
   if (quizFinished) return;
@@ -73,6 +67,14 @@ export default function QuizAttemptPanel({
   }, 1000);
 
   return () => clearInterval(timer);
+}, [quizFinished]);
+
+useEffect(() => {
+  if (!quizFinished) return;
+
+  const score = calculateScore();
+
+  attemptQuiz(conceptId, score);
 }, [quizFinished]);
 
   function handleSelect(optionIndex: number) {
@@ -133,7 +135,6 @@ export default function QuizAttemptPanel({
               answers={answers}
               onJump={(i) => setCurrent(i)}
             />
-            {/*<QuizTimer timeLeft={timeLeft} />*/}
           </div>
 
           {/* RIGHT SIDE */}

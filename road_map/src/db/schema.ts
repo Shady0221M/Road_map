@@ -1,12 +1,19 @@
-//db/schema.ts
+//@src/db/schema.ts
 import { pgEnum, pgTable, serial, varchar, text, integer, char, timestamp } from "drizzle-orm/pg-core";
+import { boolean, date } from "drizzle-orm/pg-core";
+import { uniqueIndex } from "drizzle-orm/pg-core";
 
 export const subjectEnum=pgEnum("subject_enum",["PHYSICS","CHEMISTRY","MATHS",]);
-export const chapter = pgTable("chapter",{
-    id: serial("id").primaryKey(),
 
-    subject: subjectEnum("subject").notNull(),
-    chapterName: varchar("chapter_name",{ length:150}).notNull(),
+export const chapter = pgTable("chapter", {
+  id: serial("id").primaryKey(),
+
+  subject: subjectEnum("subject").notNull(),
+  chapterName: varchar("chapter_name", { length: 150 }).notNull(),
+
+  clusterTag: varchar("cluster_tag", { length: 150 }),
+
+  order: integer("order").notNull(), 
 });
 
 export const concept= pgTable("concept",{
@@ -65,7 +72,43 @@ export const users = pgTable("users", {
 
   avatarUrl: text("avatar_url"),
 
+  dateOfBirth: date("date_of_birth"),
+  schoolName: varchar("school_name", { length: 255 }),
+  district: varchar("district", { length: 100 }),
+  classStudying: varchar("class_studying", { length: 20 }),
+  phoneNumber: varchar("phone_number", { length: 15 }),
+
+  profileCompleted: boolean("profile_completed").default(false),
+
   role: varchar("role", { length: 20 }).default("user"),
 
   createdAt: timestamp("created_at").defaultNow(),
 });
+
+export const userProgress = pgTable(
+  "user_progress",
+  {
+    id: serial("id").primaryKey(),
+
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+
+    conceptId: integer("concept_id")
+      .notNull()
+      .references(() => concept.id, { onDelete: "cascade" }),
+
+    completed: boolean("completed").default(false),
+
+    score: integer("score"),
+
+    lastAccessedAt: timestamp("last_accessed_at"),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => ({
+    uniqueUserConcept: uniqueIndex("user_concept_unique").on(
+      table.userId,
+      table.conceptId
+    ),
+  })
+);
