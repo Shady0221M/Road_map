@@ -3,6 +3,7 @@
 
 import { ChapterRow } from "@/src/types/content";
 import ChapterList from "@/app/components/ChapterList";
+import { useState } from "react";
 
 interface Props {
   clusterName: string;
@@ -11,7 +12,9 @@ interface Props {
   expanded: boolean;
   onToggle: () => void;
   targetConceptId?: number | null;
-targetChapterId?: number | null;
+  targetChapterId?: number | null;
+  expandedChapterId: number | null;
+  setExpandedChapterId: (id: number | null) => void;
 }
 
 export default function ClusterTab({
@@ -21,7 +24,9 @@ export default function ClusterTab({
   expanded,
   onToggle,
   targetChapterId,
-  targetConceptId
+  targetConceptId,
+  expandedChapterId,
+  setExpandedChapterId,
 }: Props) {
   return (
     <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
@@ -43,6 +48,8 @@ export default function ClusterTab({
             mode="user"
             targetConceptId={targetConceptId}
             targetChapterId={targetChapterId}
+            expandedChapterId={expandedChapterId}
+            setExpandedChapterId={setExpandedChapterId}
           />
         </div>
       )}

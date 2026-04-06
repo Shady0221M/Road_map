@@ -6,13 +6,11 @@ import AddConceptDialog from "@/app/components/dialogBoxes/AddConceptDialog";
 import Button from "@/app/components/ui/Button";
 import { useState } from "react";
 import { ContentRow } from "@/src/types/content";
-import ConceptList from "@/app/components/ConceptList";
 
 interface Props {
   chapterId: number;
   chapterName: string;
   onClick: () => void;
-  conceptList: ContentRow[];
   expandedcI: number | null; // index of expanded chapter
   mode?: "admin" | "user";
 }
@@ -21,7 +19,6 @@ export default function ChapterTab({
   chapterId,
   chapterName,
   onClick,
-  conceptList,
   mode = "admin",
   expandedcI,
 }: Props) {

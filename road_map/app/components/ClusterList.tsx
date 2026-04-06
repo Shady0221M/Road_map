@@ -14,6 +14,7 @@ interface Props {
 
 export default function ClusterList({ groupedChapters, subject,targetChapterId,targetConceptId }: Props) {
   const [expandedCluster, setExpandedCluster] = useState<string | null>(null);
+  const [expandedChapterId, setExpandedChapterId] = useState<number | null>(null);
 
   return (
     <div className="space-y-4">
@@ -23,19 +24,21 @@ export default function ClusterList({ groupedChapters, subject,targetChapterId,t
 
       {Object.entries(groupedChapters).map(([clusterName, chapters]) => (
         <ClusterTab
-          key={clusterName}
-          clusterName={clusterName}
-          chapters={chapters}
-          subject={subject}
-          expanded={expandedCluster === clusterName}
-          onToggle={() =>
-            setExpandedCluster(
-              expandedCluster === clusterName ? null : clusterName
-            )
-          }
-          targetConceptId={targetConceptId} 
-          targetChapterId={targetChapterId}
-        />
+            key={clusterName}
+            clusterName={clusterName}
+            chapters={chapters}
+            subject={subject}
+            expanded={expandedCluster === clusterName}
+            onToggle={() =>
+              setExpandedCluster(
+                expandedCluster === clusterName ? null : clusterName
+              )
+            }
+            targetConceptId={targetConceptId}
+            targetChapterId={targetChapterId}
+            expandedChapterId={expandedChapterId}
+            setExpandedChapterId={setExpandedChapterId}
+          />
       ))}
     </div>
   );
