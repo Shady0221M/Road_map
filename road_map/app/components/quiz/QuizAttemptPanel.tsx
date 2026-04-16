@@ -104,29 +104,66 @@ useEffect(() => {
     const score = calculateScore();
 
     return (
-      <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/70 p-4">
-        <div className="w-full max-w-3xl rounded-3xl border border-white/10 bg-white/5 p-8 shadow-lg backdrop-blur">
-          <h2 className="text-2xl font-bold">Quiz Finished 🎉</h2>
+  <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/70 p-4">
+    <div className="w-full max-w-md rounded-3xl border border-white/10 bg-gradient-to-br from-[#0f172a] to-[#111827] p-8 shadow-2xl backdrop-blur text-white text-center">
 
-          <p className="mt-2 text-lg">
-            Score: <span className="font-semibold">{score}</span> / {questions.length}
-          </p>
+      {/* 🎉 Title */}
+      <h2 className="text-3xl font-bold mb-2">
+        Quiz Completed 🎉
+      </h2>
 
-          <div className="mt-6 flex justify-end">
-            <Button onClick={onClose}>Close Quiz</Button>
-          </div>
+      <p className="text-gray-300 mb-6">
+        Great job! Here's your performance
+      </p>
+
+      {/* 🔵 Score Circle */}
+      <div className="flex justify-center mb-6">
+        <div className="h-28 w-28 rounded-full border-4 border-orange-500 flex items-center justify-center text-2xl font-bold">
+          {score}/{questions.length}
         </div>
       </div>
-    );
+
+      {/* 📊 Stats */}
+      <div className="grid grid-cols-2 gap-4 mb-6 text-sm">
+        <div className="bg-white/5 rounded-xl p-3">
+          <p className="text-gray-400">Correct</p>
+          <p className="text-green-400 font-semibold">{score}</p>
+        </div>
+        <div className="bg-white/5 rounded-xl p-3">
+          <p className="text-gray-400">Wrong</p>
+          <p className="text-red-400 font-semibold">
+            {questions.length - score}
+          </p>
+        </div>
+      </div>
+
+      {/* 🏁 Performance Message */}
+      <p className="mb-6 text-sm text-gray-300">
+        {score === questions.length
+          ? "Perfect score! 🔥"
+          : score > questions.length / 2
+          ? "Good job! Keep improving 🚀"
+          : "Keep practicing, you’ll get better 💪"}
+      </p>
+
+      {/* 🔘 Actions */}
+      <div className="flex justify-center gap-4">
+        <Button onClick={onClose}>
+          Close
+        </Button>
+      </div>
+
+    </div>
+  </div>
+);
   }
 
   const q = questions[current];
   if (!q) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-       <div className="w-full max-w-3xl max-h-[90vh] flex items-start justify-center">
-        <div className="scale-90 origin-top w-full overflow-y-auto rounded-3xl border border-white/10 bg-white/5 p-3 shadow-xl backdrop-blur">      
+    <div className="fixed inset-4 z-50 flex items-center justify-center bg-black/70">
+        <div className="scale-90 origin-center w-full overflow-y-auto rounded-3xl border border-white/10 bg-white/5 p-3 shadow-xl backdrop-blur">      
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
           {/* LEFT SIDEBAR */}
           <div className="space-y-4 flex flex-col justify-center">
@@ -181,6 +218,6 @@ useEffect(() => {
         </div>
       
     </div>
-    </div></div>
+    </div>
   );
 }

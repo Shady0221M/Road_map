@@ -227,3 +227,60 @@ body {
     stroke-dashoffset: -156px;
   }
 }
+
+.loader-svg {
+  overflow: visible;
+}
+
+.loader-group {
+  animation: slide 2s linear infinite;
+}
+
+.loader-group.delay {
+  animation-delay: 0.5s;
+}
+
+.loader-svg path {
+  stroke: url(#gradient);
+  stroke-width: 12;
+  stroke-linecap: round;
+  fill: none;
+
+  stroke-dasharray: 0 157;
+  stroke-dashoffset: 0;
+
+  animation: escalade 2s cubic-bezier(0.8, 0, 0.2, 1) infinite;
+}
+
+/* second path delay */
+.loader-group.delay path {
+  animation-delay: 0.5s;
+  stroke-dasharray: 0 157;
+  stroke-dashoffset: 1;
+}
+
+/* vertical movement */
+@keyframes slide {
+  0% {
+    transform: translateY(-40px);
+  }
+  100% {
+    transform: translateY(40px);
+  }
+}
+
+/* drawing effect */
+@keyframes escalade {
+  0% {
+    stroke-dasharray: 0 157;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 157 157;
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dasharray: 157 157;
+    stroke-dashoffset: -156;
+  }
+}
