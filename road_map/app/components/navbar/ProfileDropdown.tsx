@@ -25,26 +25,26 @@ export default function ProfileDropdown() {
   return (
     <div className="relative" ref={dropdownRef}>
       {/* Avatar Button */}
-      <Button
-        className="p-0 focus:ring-2 focus:ring-orange-500 focus:outline-none"
-        onClick={() => setOpen(!open)}
-        variant="nav"
-      >
-        <img
-          src={session.user?.image || ""}
-          alt="profile"
-          className="h-10 w-10 rounded-full border-2 border-gray-600 hover:border-orange-500 transition"
-        />
-      </Button>
+      <button
+  type="button"
+  onClick={() => setOpen(!open)}
+  className="h-12 w-12 rounded-full overflow-hidden flex items-center justify-center border border-gray-600 hover:border-orange-500 transition focus:ring-2 focus:ring-orange-500 focus:outline-none bg-transparent"
+>
+  <img
+    src="/default_avatar.png"
+    alt="profile"
+    className="h-full w-full object-cover object-center"
+  />
+</button>
 
       {/* Dropdown */}
       {open && (
         <div className="absolute right-0 mt-2 w-64 rounded-xl border border-gray-700 bg-[#1a1a1a] p-5 shadow-2xl z-50 animate-fadeIn">
           <div className="flex items-center gap-3 mb-4">
             <img
-              src={session.user?.image || ""}
+              src={session.user?.image || "/default_avatar.png"}
               alt="profile"
-              className="h-12 w-12 rounded-full border border-gray-600"
+              className="h-12 w-12 rounded-full object-cover object-center border border-gray-600"
             />
             <div>
               <p className="text-white font-semibold">{session.user?.name}</p>

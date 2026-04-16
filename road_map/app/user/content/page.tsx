@@ -49,34 +49,47 @@ const [expandedChapterId, setExpandedChapterId] = useState<number | null>(null);
 
   // Fetch
   useEffect(() => {
-    if (!selectedSubject) return;
+      if (!selectedSubject) return;
 
-    async function fetchData() {
-      setLoading(true);
+      let isActive = true;
 
-      const res = await fetch(`/api/chapters/get?subject=${selectedSubject}`);
-      const chapters = await res.json();
-      setChapterRows(chapters);
+      async function fetchData() {
+        try {
+          const res = await fetch(`/api/chapters/get?subject=${selectedSubject}`);
+          const chapters = await res.json();
 
-      const promises = chapters.map((c: ChapterRow) =>
-        fetch(`/api/chapters/concepts/get?chapterId=${c.chapterId}`).then((r) =>
-          r.json()
-        )
-      );
+          if (!isActive) return;
+          setChapterRows(chapters);
 
-      const results = await Promise.all(promises);
-      const map: Record<number, ContentRow[]> = {};
+          const promises = chapters.map((c: ChapterRow) =>
+            fetch(`/api/chapters/concepts/get?chapterId=${c.chapterId}`)
+              .then((r) => r.json())
+          );
 
-      chapters.forEach((c: ChapterRow, i: number) => {
-        map[c.chapterId] = results[i];
-      });
+          const results = await Promise.all(promises);
 
-      setConceptsByChapter(map);
-      setLoading(false);
-    }
+          if (!isActive) return;
 
-    fetchData();
-  }, [selectedSubject]);
+          const map: Record<number, ContentRow[]> = {};
+          chapters.forEach((c: ChapterRow, i: number) => {
+            map[c.chapterId] = results[i];
+          });
+
+          setConceptsByChapter(map);
+
+        } catch (err) {
+          console.error(err);
+        } finally {
+          if (isActive) setLoading(false); // ✅ ALWAYS stop loader
+        }
+      }
+
+      fetchData();
+
+      return () => {
+        isActive = false;
+      };
+    }, [selectedSubject]);
   
 
   
@@ -118,7 +131,13 @@ const [expandedChapterId, setExpandedChapterId] = useState<number | null>(null);
 
           <SubjectCardGrid
             selected={selectedSubject}
-            onSelect={setSelectedSubject}
+            onSelect={async (subject:string) => {
+              setLoading(true);          
+              setChapterRows([]);       
+              setConceptsByChapter({});
+              await new Promise((resolve) => setTimeout(resolve, 0)); 
+              setSelectedSubject(subject);
+            }}
           />
         </div>
       </section>

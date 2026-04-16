@@ -92,10 +92,10 @@ export default function ConceptTab({
         <div
           style={{
             position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
+            top: "1rem",
+            left: "1rem",
+            right: "1rem",
+            bottom: "1rem",
             background: "rgba(0,0,0,0.7)",
             display: "flex",
             justifyContent: "center",

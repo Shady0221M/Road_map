@@ -16,7 +16,7 @@ export default function Footer() {
         </div>
 
         <div className="space-y-3">
-          <h3 className="text-lg font-semibold text-white">Ignite Teaching Club</h3>
+          <h3 className="text-lg font-semibold text-white">Ignitte Teaching Club</h3>
           <p className="max-w-sm text-sm text-gray-300">
             A community of learners and mentors working to make competitive exam prep accessible for everyone.
           </p>
@@ -24,7 +24,7 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-white/10 px-6 py-6 text-center text-sm text-gray-500">
-        © {new Date().getFullYear()} Ignite Teaching Club • All rights reserved.
+        © {new Date().getFullYear()} Ignitte Teaching Club • All rights reserved.
       </div>
     </footer>
   );
